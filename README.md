@@ -7,6 +7,11 @@
 
 🌍 [READ THIS IN ENGLISH](README_en.md)
 
+> **🧩 Fork 说明**：这是 [chatchat-space/Langchain-Chatchat](https://github.com/chatchat-space/Langchain-Chatchat) 的二次开发版本。相对上游新增两块能力：
+> **① Excel 结构化入库解析器**——表头识别 + 行转文档块，把表格拆成行级检索粒度；
+> **② 混合检索**——向量 + BM25（jieba 分词）双路召回、RRF 融合、可选 rerank，`SEARCH_METHOD` 开关切换，原检索路径零改动。
+> 20 题改写测试集实测：**Hit@3 90% → 100%，MRR +6%**（[评测表](README.md#检索效果对比实验20-题问答对) / [验收记录](docs/acceptance-log.md)）。
+
 📃 **LangChain-Chatchat** (原 Langchain-ChatGLM)
 
 基于 ChatGLM 等大语言模型与 Langchain 等应用框架实现，开源、可离线部署的 RAG 与 Agent 应用项目。
@@ -15,6 +20,12 @@
 
 ## 目录
 
+* [本项目（fork）的二次开发改动](README.md#本项目fork的二次开发改动)
+    * [改动点一：Excel 结构化入库解析器](README.md#改动点一excel-结构化入库解析器表头识别--行转文档块)
+    * [改动点二：混合检索（向量 + BM25 RRF）与 LLM Rerank](README.md#改动点二混合检索向量--bm25-rrf-与-llm-rerank)
+    * [检索效果对比实验（20 题问答对）](README.md#检索效果对比实验20-题问答对)
+    * [干净环境复跑步骤](README.md#干净环境复跑步骤windows)
+    * [与原版差异对照](README.md#与原版差异对照)
 * [概述](README.md#概述)
 * [功能介绍](README.md#功能介绍)
     * [0.3.x 功能一览](README.md#03x-版本功能一览)
@@ -23,10 +34,6 @@
     * [pip 安装部署](README.md#pip-安装部署)
     * [源码安装部署/开发部署](README.md#源码安装部署开发部署)
     * [Docker 部署](README.md#docker-部署)
-* [本项目（fork）的二次开发改动](README.md#本项目fork的二次开发改动)
-    * [改动点一：Excel 结构化入库解析器](README.md#改动点一excel-结构化入库解析器表头识别--行转文档块)
-    * [改动点二：混合检索（向量 + BM25 RRF）与 LLM Rerank](README.md#改动点二混合检索向量--bm25-rrf-与-llm-rerank)
-    * [检索效果对比实验（20 题问答对）](README.md#检索效果对比实验20-题问答对)
 * [项目里程碑](README.md#项目里程碑)
 * [联系我们](README.md#联系我们)
 
@@ -328,6 +335,22 @@ docker pull ccr.ccs.tencentyun.com/langchain-chatchat/chatchat:0.3.1.3-93e2c87-2
 ## 本项目（fork）的二次开发改动
 
 > 以下为 fork 仓库相对上游的定制改动，详细设计见仓库根目录 [二次开发笔记.md](二次开发笔记.md)。
+> 全部改动在 `feature/excel-loader-and-hybrid-search` 分支，分层提交如下（`git log master..HEAD`）：
+
+```
+63d1264  feat: Excel structured loader + hybrid retrieval (vector + BM25 RRF) with optional rerank
+878fb72  docs: add secondary development notes, deployment guide and startup script
+d6889e6  feat(evaluation): extract testset.json (20 QAs, 5 docs) + degradation & chunk tests
+e51d1c8  docs(acceptance): add acceptance-log, extension-points and architecture docs
+02ccea2  feat(hybrid): add full-chain retrieval logging (jieba/vec/bm25/rrf/rerank)
+c406b80  docs(readme): add clean-env rerun steps and upstream-diff table
+0536b93  chore: remove legacy eval script at repo root (moved to evaluation/)
+bc523da  docs(acceptance): finalize 27/27 PASS summary block with commit count
+dfd4dac  chore(gitignore): ignore local-only eval artifacts dir
+ea281ce  docs: rename retrieval-design-qa and neutralize wording
+```
+
+> 对上游开放的 PR：[chatchat-space/Langchain-Chatchat#5518](https://github.com/chatchat-space/Langchain-Chatchat/pull/5518)。
 
 ### 改动点一：Excel 结构化入库解析器（表头识别 + 行转文档块）
 
