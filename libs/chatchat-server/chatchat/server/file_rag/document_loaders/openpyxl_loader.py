@@ -74,7 +74,7 @@ class OpenpyxlExcelLoader:
             seen += 1
 
         docs: List[Document] = []
-        for row_no, cells in data_rows[1:]:
+        for row_no, cells in data_rows[1:]: # 跳过表头行
             # 行长度对齐表头
             cells = cells + [""] * (len(col_names) - len(cells))
             pairs = []
